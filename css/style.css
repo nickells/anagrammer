@@ -1,0 +1,18 @@
+h1 {
+  font-size: 74px;
+  font-family: sans-serif;
+  font-weight: 100;
+  letter-spacing: 0.6em
+}
+
+h1:nth-child(2) {
+  opacity: 0;
+
+}
+
+span {
+  transition: 800ms ease-in-out;
+  transform: translateX(0px);
+  transition-delay: 800ms;
+  display: inline-block;
+}
