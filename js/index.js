@@ -40,14 +40,28 @@ function anagramize(from, to, selector) {
   const fromDistances = getOffsets(fromTextChildren)
 
   let toMove = differenceOfObjects(toDistances, fromDistances)
-  fromTextChildren.forEach(span => {
+
+  function iterateAnimating(index){
+    if (index === fromTextChildren.length) return
+    let span = fromTextChildren[index]
     let letter = span.innerText
     const distance = toMove[letter].shift()
     requestAnimationFrame(() => {
       span.style.transform = `translateX(${-distance}px)`
     })
-  })
+    setTimeout(()=>{
+      iterateAnimating(index+1)
+    }, 100)
+  }
 
+  iterateAnimating(0)
+  // fromTextChildren.forEach(span => {
+  //   let letter = span.innerText
+  //   const distance = toMove[letter].shift()
+  //   requestAnimationFrame(() => {
+  //     span.style.transform = `translateX(${-distance}px)`
+  //   })
+  // })
 }
 
-anagramize('chill networks', 'nick ellsworth', 'text')
+anagramize('cloth wrinkles', 'nick ellsworth', 'text')
