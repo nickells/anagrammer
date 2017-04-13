@@ -1,3 +1,7 @@
+body {
+  background: black;
+}
+
 h1 {
   font-size: 74px;
   font-family: sans-serif;
@@ -11,8 +15,20 @@ h1:nth-child(2) {
 }
 
 span {
-  transition: 800ms ease-in-out;
+  color: #CCC;
+  transition: transform 800ms ease-in-out, filter 200ms ease-in, color 200ms ease-in;
   transform: translateX(0px);
-  transition-delay: 800ms;
   display: inline-block;
+}
+
+.is-background {
+  color: #AAA;
+  transform: scale(0.8);
+  filter: blur(1px);
+}
+
+.is-foreground {
+  color: #FFF;
+  transform: scale(1.2);
+  filter: blur(1px);
 }

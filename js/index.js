@@ -1,3 +1,14 @@
+function shuffle(array){
+  let length = array.length
+  for (let i = 0; i < length; i++){
+    let rand = Math.floor(Math.random() * length)
+    let temp = array[rand]
+    array[rand] = array[i]
+    array[i] = temp
+  }
+  return array
+}
+
 function spanIze(word) {
   return word.split('')
   .map(char => `<span>${char === ' ' ? '&nbsp;' : char}</span>`)
@@ -5,20 +16,33 @@ function spanIze(word) {
 }
 
 function getOffsets(domArray) {
-  const map = domArray.reduce((obj, item) => {
-    const letter = item.innerText
-    if (!obj[letter]) obj[letter] = []
-    obj[letter].push(item.offsetLeft)
+  const map = domArray.reduce((obj, $item) => {
+    const letter = $item.innerText
+    if (!obj[letter]) obj[letter] = {
+      $elems: [],
+      offsets: []
+    }
+    obj[letter].$elems.push($item)
+    obj[letter].offsets.push($item.offsetLeft)
     return obj
   }, {})
   return map
 }
 
-function differenceOfObjects(obj1, obj2) {
-  return Object.keys(obj1).reduce((newObject, key) => {
-    if (!newObject[key]) newObject[key] = []
-    obj1[key].forEach((val, index) => {
-      newObject[key][index] = obj2[key][index] - val
+function getDifferenceOfOffsets(toObject, fromObject) {
+  return Object.keys(toObject).reduce((newObject, key) => {
+    // set up new data structure
+    if (!newObject[key]) {
+      newObject[key] = {
+        $elems: [],
+        offsets: []
+      }
+    }
+    toObject[key].$elems.forEach((elem, index) => {
+      newObject[key].$elems[index] = fromObject[key].$elems[index]
+    })
+    toObject[key].offsets.forEach((offset, index) => {
+      newObject[key].offsets[index] = fromObject[key].offsets[index] - offset
     })
     return newObject
   }, {})
@@ -39,15 +63,25 @@ function anagramize(from, to, selector) {
   const toDistances = getOffsets(toTextChildren)
   const fromDistances = getOffsets(fromTextChildren)
 
-  let toMove = differenceOfObjects(toDistances, fromDistances)
+  let toMove = getDifferenceOfOffsets(toDistances, fromDistances)
+
+  const shuffledFromTextChildren = shuffle(fromTextChildren)
 
   function iterateAnimating(index){
-    if (index === fromTextChildren.length) return
-    let span = fromTextChildren[index]
-    let letter = span.innerText
-    const distance = toMove[letter].shift()
+    if (index === shuffledFromTextChildren.length) return
+    let letter = shuffledFromTextChildren[index].innerText
+    const distance = toMove[letter].offsets.shift()
+    const span  = toMove[letter].$elems.shift()
     requestAnimationFrame(() => {
-      span.style.transform = `translateX(${-distance}px)`
+      // begin animation
+      const directionClass = Math.random() > 0.5 ? 'is-background' : 'is-foreground'
+      span.classList.add(directionClass)
+      setTimeout(()=>{
+        span.style.transform = `translateX(${-distance}px)`
+      }, 800)
+      setTimeout(()=>{
+        span.classList.remove(directionClass)
+      }, 1600)
     })
     setTimeout(()=>{
       iterateAnimating(index+1)
@@ -55,13 +89,6 @@ function anagramize(from, to, selector) {
   }
 
   iterateAnimating(0)
-  // fromTextChildren.forEach(span => {
-  //   let letter = span.innerText
-  //   const distance = toMove[letter].shift()
-  //   requestAnimationFrame(() => {
-  //     span.style.transform = `translateX(${-distance}px)`
-  //   })
-  // })
-}
+ }
 
 anagramize('cloth wrinkles', 'nick ellsworth', 'text')
