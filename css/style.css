@@ -4,6 +4,8 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
+  padding: 0;
+  margin: 0;
 }
 
 #text {
@@ -12,15 +14,20 @@ body {
 
 h1 {
   font-size: 100px;
-  font-family: 'Abril Fatface', cursive;
+  font-family: serif;
+  letter-spacing: 0.05em;
   font-weight: 100;
-  /*letter-spacing: 0.05em;*/
-  /*text-transform: uppercase;*/
+  user-select: none;
+  cursor: default;
 }
 
 h1:nth-child(2) {
-  opacity: 0;
-
+  /*opacity: 0;*/
+  position: fixed;
+  top: 0;
+  z-index: -1;
+  border: 1px solid red;
+  visibility: hidden;
 }
 
 span {
@@ -38,10 +45,11 @@ span {
 
 .is-background {
   color: #AAA;
-  transform-style: preserve-3d;
+  filter: blur(0.5px);
 }
 
 .is-foreground {
   color: #FFF;
-  transform-style: preserve-3d;
+  filter: blur(0.5px);
+
 }

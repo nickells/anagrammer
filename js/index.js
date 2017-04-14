@@ -1,12 +1,11 @@
-
 // should match with css
 const TRANSITION_TIME = 800
+const TRANSITION_DELAY = 800
 
 // can be whatever
-const TRANSITION_DELAY = 800
 const ITERATION_INTERVAL = 100
-const INITIAL_DELAY = 500
-const RANDOMIZE = true
+const INITIAL_DELAY = 1000
+const SHUFFLE = true
 
 const Z_DISTANCE = 0.1
 
@@ -32,20 +31,6 @@ function spanIze(word) {
   return word.split('')
   .map(char => `<span>${char === ' ' ? '&nbsp;' : char}</span>`)
   .join('')
-}
-
-function getOffsets(domArray) {
-  const map = domArray.reduce((obj, $item) => {
-    const letter = $item.innerText
-    if (!obj[letter]) obj[letter] = {
-      $elems: [],
-      offsets: []
-    }
-    obj[letter].$elems.push($item)
-    obj[letter].offsets.push($item.offsetLeft)
-    return obj
-  }, {})
-  return map
 }
 
 const sortDomElements = (elem, elem2) => {
@@ -82,11 +67,13 @@ function anagramize(to, from, selector) {
 
   let toMove = getDifferenceOfOffsets(toTextChildren, fromTextChildren)
 
-  const shuffledFromTextChildren = RANDOMIZE ? shuffle(toMove) : toMove
+  const shuffledFromTextChildren = SHUFFLE ? shuffle(toMove) : toMove
 
   function iterateAnimating(index){
-    if (index === toMove.length) return
-    let {elem: span, distance} = toMove[index]
+    if (index === toMove.length){
+      return
+    }
+    let { elem: span, distance } = toMove[index]
     if (distance !== 0){ 
       requestAnimationFrame(() => {
         const directionClass = Math.random() > 0.5 ? 'is-background' : 'is-foreground'
