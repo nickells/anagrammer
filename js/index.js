@@ -74,6 +74,7 @@ function anagramize(to, from, selector, delay) {
       return
     }
     let { elem: span, distance } = toMove[index]
+    console.log(distance)
     if (distance !== 0){ 
       requestAnimationFrame(() => {
         const directionClass = Math.random() > 0.5 ? 'is-background' : 'is-foreground'
