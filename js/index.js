@@ -4,7 +4,7 @@ const TRANSITION_DELAY = 800
 
 // can be whatever
 const ITERATION_INTERVAL = 100
-const INITIAL_DELAY = 1000
+const INITIAL_DELAY = 2000
 const SHUFFLE = true
 
 const Z_DISTANCE = 0.1
@@ -51,7 +51,7 @@ function getDifferenceOfOffsets(toText, fromText) {
   })
 }
 
-function anagramize(to, from, selector) {
+function anagramize(to, from, selector, delay) {
   const container = document.getElementById(selector)
 
   const fromText = document.createElement('h1')
@@ -99,8 +99,7 @@ function anagramize(to, from, selector) {
       iterateAnimating(index+1)
     }, ITERATION_INTERVAL)
   }
-
-  setTimeout(()=>iterateAnimating(0), INITIAL_DELAY)
+  setTimeout(()=>iterateAnimating(0), delay)
  }
 
 function getQueryParamaters(){
@@ -112,11 +111,11 @@ function getQueryParamaters(){
   }, {})
 }
 
-let {to, from} = getQueryParamaters()
+let {to, from, delay} = getQueryParamaters()
 to = to.replace('%20', ' ')
 from = from.replace('%20', ' ')
 if (validate(to, from)){
-  anagramize(to, from, 'text')
+  anagramize(to, from, 'text', delay || INITIAL_DELAY)
 } else {
   console.error('invalid anagram')
 }
