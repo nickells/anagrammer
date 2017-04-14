@@ -6,7 +6,7 @@ h1 {
   font-size: 74px;
   font-family: sans-serif;
   font-weight: 100;
-  letter-spacing: 0.6em
+  letter-spacing: 0.2em
 }
 
 h1:nth-child(2) {
@@ -16,19 +16,21 @@ h1:nth-child(2) {
 
 span {
   color: #CCC;
-  transition: transform 800ms ease-in-out, filter 200ms ease-in, color 200ms ease-in;
+  transition: transform 800ms ease-in-out, filter 200ms ease-in-out, color 200ms ease-in-out;
   transform: translateX(0px);
+  z-index: 2;
   display: inline-block;
+  text-shadow: 0px 15px 15px rgba(0, 0, 0, 0.9)
 }
 
 .is-background {
   color: #AAA;
-  transform: scale(0.8);
+  z-index: 1;
   filter: blur(1px);
 }
 
 .is-foreground {
   color: #FFF;
-  transform: scale(1.2);
+  z-index: 3;
   filter: blur(1px);
 }

@@ -1,3 +1,15 @@
+
+// should match with css
+const TRANSITION_TIME = 800
+
+// can be whatever
+const TRANSITION_DELAY = 800
+const ITERATION_INTERVAL = 100
+const INITIAL_DELAY = 500
+const RANDOMIZE = true
+
+const Z_DISTANCE = 0.2
+
 function shuffle(array){
   let length = array.length
   for (let i = 0; i < length; i++){
@@ -65,7 +77,7 @@ function anagramize(from, to, selector) {
 
   let toMove = getDifferenceOfOffsets(toDistances, fromDistances)
 
-  const shuffledFromTextChildren = shuffle(fromTextChildren)
+  const shuffledFromTextChildren = RANDOMIZE ? shuffle(fromTextChildren) : fromTextChildren
 
   function iterateAnimating(index){
     if (index === shuffledFromTextChildren.length) return
@@ -73,22 +85,29 @@ function anagramize(from, to, selector) {
     const distance = toMove[letter].offsets.shift()
     const span  = toMove[letter].$elems.shift()
     requestAnimationFrame(() => {
-      // begin animation
       const directionClass = Math.random() > 0.5 ? 'is-background' : 'is-foreground'
+      // move forward or backward
       span.classList.add(directionClass)
+      const scale = directionClass === 'is-background' ? 1.0 - Z_DISTANCE : 1.0 + Z_DISTANCE
+      span.style.transform = `scale(${scale})`
+      
+      // begin animation
       setTimeout(()=>{
-        span.style.transform = `translateX(${-distance}px)`
-      }, 800)
+        span.style.transform = `translateX(${-distance}px) scale(${scale})`
+      }, TRANSITION_DELAY)
+
+      // move back to initial z distance
       setTimeout(()=>{
         span.classList.remove(directionClass)
-      }, 1600)
+        span.style.transform = `translateX(${-distance}px) scale(1.0)`
+      }, TRANSITION_TIME + TRANSITION_DELAY)
     })
     setTimeout(()=>{
       iterateAnimating(index+1)
-    }, 100)
+    }, ITERATION_INTERVAL)
   }
 
-  iterateAnimating(0)
+  setTimeout(()=>iterateAnimating(0), INITIAL_DELAY)
  }
 
-anagramize('cloth wrinkles', 'nick ellsworth', 'text')
+anagramize('chills network', 'nick ellsworth', 'text')
