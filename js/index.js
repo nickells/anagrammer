@@ -8,7 +8,14 @@ const ITERATION_INTERVAL = 100
 const INITIAL_DELAY = 500
 const RANDOMIZE = true
 
-const Z_DISTANCE = 0.2
+const Z_DISTANCE = 0.1
+
+function validate(from, to){
+  if (from.length !== to.length) return false
+  let fromArr = from.split('').sort()
+  let toArr = to.split('').sort()
+  return fromArr.every((letter, index) => toArr[index] === letter)
+}
 
 function shuffle(array){
   let length = array.length
@@ -84,24 +91,27 @@ function anagramize(from, to, selector) {
     let letter = shuffledFromTextChildren[index].innerText
     const distance = toMove[letter].offsets.shift()
     const span  = toMove[letter].$elems.shift()
-    requestAnimationFrame(() => {
-      const directionClass = Math.random() > 0.5 ? 'is-background' : 'is-foreground'
-      // move forward or backward
-      span.classList.add(directionClass)
-      const scale = directionClass === 'is-background' ? 1.0 - Z_DISTANCE : 1.0 + Z_DISTANCE
-      span.style.transform = `scale(${scale})`
-      
-      // begin animation
-      setTimeout(()=>{
-        span.style.transform = `translateX(${-distance}px) scale(${scale})`
-      }, TRANSITION_DELAY)
+    if (distance !== 0){ 
+      requestAnimationFrame(() => {
+        const directionClass = Math.random() > 0.5 ? 'is-background' : 'is-foreground'
+        // move forward or backward
+        span.classList.add(directionClass)
+        const scale = directionClass === 'is-background' ? 1.0 - Z_DISTANCE : 1.0 + Z_DISTANCE
+        span.style.transform = `scale(${scale})`
+        span.style.zIndex = directionClass === 'is-background' ? 1 : 3
+        
+        // begin animation
+        setTimeout(()=>{
+          span.style.transform = `translateX(${-distance}px) scale(${scale})`
+        }, TRANSITION_DELAY)
 
-      // move back to initial z distance
-      setTimeout(()=>{
-        span.classList.remove(directionClass)
-        span.style.transform = `translateX(${-distance}px) scale(1.0)`
-      }, TRANSITION_TIME + TRANSITION_DELAY)
-    })
+        // move back to initial z distance
+        setTimeout(()=>{
+          span.classList.remove(directionClass)
+          span.style.transform = `translateX(${-distance}px) scale(1.0)`
+        }, TRANSITION_TIME + TRANSITION_DELAY)
+      })
+    }
     setTimeout(()=>{
       iterateAnimating(index+1)
     }, ITERATION_INTERVAL)
@@ -110,4 +120,20 @@ function anagramize(from, to, selector) {
   setTimeout(()=>iterateAnimating(0), INITIAL_DELAY)
  }
 
-anagramize('chills network', 'nick ellsworth', 'text')
+function getQueryParamaters(){
+  let parts = window.location.search.substring(1, window.location.search.length).split('&')
+  return parts.reduce((obj, part)=>{
+    let partsOfParts = part.split('=')
+    obj[partsOfParts[0]] = partsOfParts[1]
+    return obj
+  }, {})
+}
+
+let {to, from} = getQueryParamaters()
+to = to.replace('%20', ' ')
+from = from.replace('%20', ' ')
+if (validate(to, from)){
+  anagramize(to, from, 'text')
+} else {
+  console.error('invalid anagram')
+}
