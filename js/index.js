@@ -9,11 +9,38 @@ const SHUFFLE = true
 
 const Z_DISTANCE = 0.1
 
-function validate(from, to){
+function addExtraSpaces(toText, fromText){
+  let fromTextSpaces = 0
+  let toTextSpaces = 0
+  for (let i = 0; i < fromText.length; i++){
+    if (fromText[i] === ' ') fromTextSpaces += 1
+  }
+  for (let i = 0; i < toText.length; i++){
+    if (toText[i] === ' ') toTextSpaces += 1
+  }
+  if (fromTextSpaces - toTextSpaces > 0){
+    for (let i = 0; i < (fromTextSpaces - toTextSpaces); i++){
+      if (i % 2 === 0) toText = ' ' + toText
+      else toText = toText + ' '
+    }
+  }
+  if (toTextSpaces - fromTextSpaces > 0){
+   for (let i = 0; i < (toTextSpaces - fromTextSpaces); i++){
+     if (i % 2 === 0) fromText = ' ' + fromText
+     else fromText = fromText + ' '
+   }
+  }
+  return {
+    normalizedTo: toText,
+    normalizedFrom: fromText,
+  }
+}
+
+function validate(to, from){
   if (from.length !== to.length) return false
-  let fromArr = from.split('').sort()
-  let toArr = to.split('').sort()
-  return fromArr.every((letter, index) => toArr[index] === letter)
+  let sortedFromArr = from.split('').sort()
+  let sortedToArr = to.split('').sort()
+  return sortedFromArr.every((letter, index) => sortedToArr[index] === letter)
 }
 
 function shuffle(array){
@@ -78,6 +105,7 @@ function anagramize(to, from, selector, delay) {
     if (distance !== 0){ 
       requestAnimationFrame(() => {
         const directionClass = Math.random() > 0.5 ? 'is-background' : 'is-foreground'
+        // const directionClass = 'is-background'
         // move forward or backward
         span.classList.add(directionClass)
         const scale = directionClass === 'is-background' ? 1.0 - Z_DISTANCE : 1.0 + Z_DISTANCE
@@ -113,10 +141,11 @@ function getQueryParamaters(){
 }
 
 let {to, from, delay} = getQueryParamaters()
-to = to.replace('%20', ' ')
-from = from.replace('%20', ' ')
-if (validate(to, from)){
-  anagramize(to, from, 'text', delay || INITIAL_DELAY)
+to = to.replace(/%20/g, ' ')
+from = from.replace(/%20/g, ' ')
+const { normalizedTo, normalizedFrom } = addExtraSpaces(to, from)
+if (validate(normalizedTo, normalizedFrom)){
+  anagramize(normalizedTo, normalizedFrom, 'text', delay || INITIAL_DELAY)
 } else {
   console.error('invalid anagram')
 }

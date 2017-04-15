@@ -15,10 +15,11 @@ body {
 h1 {
   font-size: 120px;
   font-family: serif;
-  letter-spacing: 0.05em;
+  /*letter-spacing: 0.05em;*/
   font-weight: 100;
   user-select: none;
   cursor: default;
+  text-rendering: optimizeLegibility;
 
 }
 
@@ -34,7 +35,7 @@ h1:nth-child(2) {
 }
 
 span {
-  color: #CCC;
+  color: #DDD;
   position: relative;
   transition: transform 800ms ease-in-out,
   filter 800ms ease-in-out, 
@@ -47,7 +48,7 @@ span {
 }
 
 .is-background {
-  color: #AAA;
+  color: #BBB;
   filter: blur(0.5px);
 }
 
