@@ -9,26 +9,26 @@ const SHUFFLE = true
 
 const Z_DISTANCE = 0.1
 
-function addExtraSpaces(toText, fromText){
+function addExtraSpaces(toText, fromText) {
   let fromTextSpaces = 0
   let toTextSpaces = 0
-  for (let i = 0; i < fromText.length; i++){
+  for (let i = 0; i < fromText.length; i++) {
     if (fromText[i] === ' ') fromTextSpaces += 1
   }
-  for (let i = 0; i < toText.length; i++){
+  for (let i = 0; i < toText.length; i++) {
     if (toText[i] === ' ') toTextSpaces += 1
   }
-  if (fromTextSpaces - toTextSpaces > 0){
-    for (let i = 0; i < (fromTextSpaces - toTextSpaces); i++){
-      if (i % 2 === 0) toText = ' ' + toText
-      else toText = toText + ' '
+  if (fromTextSpaces - toTextSpaces > 0) {
+    for (let i = 0; i < (fromTextSpaces - toTextSpaces); i++) {
+      if (i % 2 === 0) toText = ` ${toText}`
+      else toText = `${toText} `
     }
   }
-  if (toTextSpaces - fromTextSpaces > 0){
-   for (let i = 0; i < (toTextSpaces - fromTextSpaces); i++){
-     if (i % 2 === 0) fromText = ' ' + fromText
-     else fromText = fromText + ' '
-   }
+  if (toTextSpaces - fromTextSpaces > 0) {
+    for (let i = 0; i < (toTextSpaces - fromTextSpaces); i++) {
+      if (i % 2 === 0) fromText = ` ${fromText}`
+      else fromText = `${fromText} `
+    }
   }
   return {
     normalizedTo: toText,
@@ -36,18 +36,18 @@ function addExtraSpaces(toText, fromText){
   }
 }
 
-function validate(to, from){
+function validate(to, from) {
   if (from.length !== to.length) return false
-  let sortedFromArr = from.split('').sort()
-  let sortedToArr = to.split('').sort()
+  const sortedFromArr = from.split('').sort()
+  const sortedToArr = to.split('').sort()
   return sortedFromArr.every((letter, index) => sortedToArr[index] === letter)
 }
 
-function shuffle(array){
-  let length = array.length
-  for (let i = 0; i < length; i++){
-    let rand = Math.floor(Math.random() * length)
-    let temp = array[rand]
+function shuffle(array) {
+  const length = array.length
+  for (let i = 0; i < length; i++) {
+    const rand = Math.floor(Math.random() * length)
+    const temp = array[rand]
     array[rand] = array[i]
     array[i] = temp
   }
@@ -60,22 +60,49 @@ function spanIze(word) {
   .join('')
 }
 
-const sortDomElements = (elem, elem2) => {
+function sortDomElements(elem, elem2) {
   if (elem.innerHTML < elem2.innerHTML) return -1
-  else if (elem.innerHTML > elem2.innerHTML) return 1
-  else return 0
+  if (elem.innerHTML > elem2.innerHTML) return 1
+  return 0
 }
 
 function getDifferenceOfOffsets(toText, fromText) {
-  let sortedToText = toText.sort(sortDomElements)
-  let sortedFromText = fromText.sort(sortDomElements)
+  const sortedToText = toText.sort(sortDomElements)
+  const sortedFromText = fromText.sort(sortDomElements)
 
-  return sortedFromText.map((elem, index) => {
-    return {
-      elem,
-      distance: sortedToText[index].getBoundingClientRect().left - elem.getBoundingClientRect().left
-    }
-  })
+  return sortedFromText.map((elem, index) => ({
+    elem,
+    distance: sortedToText[index].getBoundingClientRect().left - elem.getBoundingClientRect().left,
+  }))
+}
+
+function animateSpan(span, distance) {
+  const directionClass = Math.random() > 0.5 ? 'is-background' : 'is-foreground'
+  // move forward or backward
+  span.classList.add(directionClass)
+  const scale = directionClass === 'is-background' ? 1.0 - Z_DISTANCE : 1.0 + Z_DISTANCE
+  span.style.transform = `scale(${scale})`
+  span.style.zIndex = directionClass === 'is-background' ? 1 : 3
+
+  // begin animation
+  setTimeout(() => {
+    span.style.transform = `translateX(${distance}px) scale(${scale})`
+  }, TRANSITION_DELAY)
+
+  // move back to initial z distance
+  setTimeout(() => {
+    span.classList.remove(directionClass)
+    span.style.transform = `translateX(${distance}px) scale(1.0)`
+  }, TRANSITION_TIME + TRANSITION_DELAY)
+}
+
+function iterateAnimating(index, toMove) {
+  if (index === toMove.length) return
+  const { elem: span, distance } = toMove[index]
+  if (distance !== 0) requestAnimationFrame(() => animateSpan(span, distance))
+  setTimeout(() => {
+    iterateAnimating(index + 1, toMove)
+  }, ITERATION_INTERVAL)
 }
 
 function anagramize(to, from, selector, delay) {
@@ -89,63 +116,30 @@ function anagramize(to, from, selector, delay) {
   toText.innerHTML = spanIze(to)
   container.appendChild(toText)
 
-  const toTextChildren = Array.from(toText.children)
-  const fromTextChildren = Array.from(fromText.children)
-
-  let toMove = getDifferenceOfOffsets(toTextChildren, fromTextChildren)
-
+  const toMove = getDifferenceOfOffsets(Array.from(toText.children), Array.from(fromText.children))
   const shuffledFromTextChildren = SHUFFLE ? shuffle(toMove) : toMove
+  setTimeout(() => iterateAnimating(0, shuffledFromTextChildren), delay)
+}
 
-  function iterateAnimating(index){
-    if (index === toMove.length){
-      return
-    }
-    let { elem: span, distance } = toMove[index]
-    console.log(distance)
-    if (distance !== 0){ 
-      requestAnimationFrame(() => {
-        const directionClass = Math.random() > 0.5 ? 'is-background' : 'is-foreground'
-        // const directionClass = 'is-background'
-        // move forward or backward
-        span.classList.add(directionClass)
-        const scale = directionClass === 'is-background' ? 1.0 - Z_DISTANCE : 1.0 + Z_DISTANCE
-        span.style.transform = `scale(${scale})`
-        span.style.zIndex = directionClass === 'is-background' ? 1 : 3
-        
-        // begin animation
-        setTimeout(()=>{
-          span.style.transform = `translateX(${distance}px) scale(${scale})`
-        }, TRANSITION_DELAY)
-
-        // move back to initial z distance
-        setTimeout(()=>{
-          span.classList.remove(directionClass)
-          span.style.transform = `translateX(${distance}px) scale(1.0)`
-        }, TRANSITION_TIME + TRANSITION_DELAY)
-      })
-    }
-    setTimeout(()=>{
-      iterateAnimating(index+1)
-    }, ITERATION_INTERVAL)
-  }
-  setTimeout(()=>iterateAnimating(0), delay)
- }
-
-function getQueryParamaters(){
-  let parts = window.location.search.substring(1, window.location.search.length).split('&')
-  return parts.reduce((obj, part)=>{
-    let partsOfParts = part.split('=')
+function getQueryParamaters() {
+  const parts = window.location.search.substring(1, window.location.search.length).split('&')
+  return parts.reduce((obj, part) => {
+    const partsOfParts = part.split('=')
     obj[partsOfParts[0]] = partsOfParts[1]
     return obj
   }, {})
 }
 
-let {to, from, delay} = getQueryParamaters()
-to = to.replace(/%20/g, ' ')
-from = from.replace(/%20/g, ' ')
-const { normalizedTo, normalizedFrom } = addExtraSpaces(to, from)
-if (validate(normalizedTo, normalizedFrom)){
-  anagramize(normalizedTo, normalizedFrom, 'text', delay || INITIAL_DELAY)
-} else {
-  console.error('invalid anagram')
+function begin() {
+  let { to, from, delay } = getQueryParamaters()
+  to = to.replace(/%20/g, ' ')
+  from = from.replace(/%20/g, ' ')
+  const { normalizedTo, normalizedFrom } = addExtraSpaces(to, from)
+  if (validate(normalizedTo, normalizedFrom)) {
+    anagramize(normalizedTo, normalizedFrom, 'text', delay || INITIAL_DELAY)
+  } else {
+    console.error('invalid anagram')
+  }
 }
+
+begin()
