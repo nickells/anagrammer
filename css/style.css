@@ -13,7 +13,7 @@ body {
 }
 
 h1 {
-  font-size: 120px;
+  font-size: 8vw;
   font-family: "Helvetica", sans-serif;
   text-transform: uppercase;
   /*letter-spacing: 0.05em;*/
@@ -22,10 +22,6 @@ h1 {
   cursor: default;
   text-rendering: optimizeLegibility;
 
-}
-
-@media (max-width: 768px) {
-  h1 {font-size: 8vw }
 }
 
 h1:nth-child(2) {
