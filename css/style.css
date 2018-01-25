@@ -14,9 +14,10 @@ body {
 
 h1 {
   font-size: 120px;
-  font-family: serif;
+  font-family: "Helvetica", sans-serif;
+  text-transform: uppercase;
   /*letter-spacing: 0.05em;*/
-  font-weight: 100;
+  font-weight: 600;
   user-select: none;
   cursor: default;
   text-rendering: optimizeLegibility;
