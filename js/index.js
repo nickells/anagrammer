@@ -140,6 +140,12 @@ function begin() {
   } else {
     console.error('invalid anagram')
   }
+
+  if (to.toLowerCase() === 'nick ellsworth') {
+    setTimeout(() => {
+      window.location = 'http://nickmakes.website'
+    }, 8000)
+  }
 }
 
 begin()
